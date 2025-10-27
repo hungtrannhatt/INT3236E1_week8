@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/hungtrannhatt/INT3236E1_week8.git
-    path: k8s
+    path: hello-spring-k8s/k8s
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
