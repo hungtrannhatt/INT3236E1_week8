@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/hungtrannhatt/hello-spring-k8s.git
+    repoURL: https://github.com/hungtrannhatt/INT3236E1_week8.git
+    path: .
     targetRevision: main
-    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: default

@@ -1,22 +1,20 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web-login
-  labels:
-    app: web-login
+  labels: { app: web-login }
   annotations:
-    # Cho Argo CD Image Updater theo dõi container "web" dùng image GHCR
+    # Cho Argo CD Image Updater biết ảnh nào cần theo dõi:
     argocd-image-updater.argoproj.io/image-list: web=ghcr.io/hungtrannhatt/hello-spring-k8s
+    # Chính sách chọn tag (ở đây là 'latest' hoặc semver đều được)
     argocd-image-updater.argoproj.io/web.update-strategy: latest
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: web-login
+    matchLabels: { app: web-login }
   template:
     metadata:
-      labels:
-        app: web-login
+      labels: { app: web-login }
     spec:
       imagePullSecrets:
         - name: ghcr-pull
@@ -26,6 +24,16 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom: { configMapKeyRef: { name: web-config, key: SPRING_DATASOURCE_URL } }
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom: { secretKeyRef: { name: mysql-secret, key: MYSQL_USER } }
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom: { secretKeyRef: { name: mysql-secret, key: MYSQL_PASSWORD } }
+            # (tuỳ chọn) mở hết actuator
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "*"
           readinessProbe:
             httpGet: { path: /actuator/health/readiness, port: 8080 }
             initialDelaySeconds: 10
