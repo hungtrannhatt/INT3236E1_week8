@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-login
+  labels:
+    app: web-login
+  annotations:
+    # Cho Argo CD Image Updater theo dõi container "web" dùng image GHCR
+    argocd-image-updater.argoproj.io/image-list: web=ghcr.io/hungtrannhatt/hello-spring-k8s
+    argocd-image-updater.argoproj.io/web.update-strategy: latest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-login
+  template:
+    metadata:
+      labels:
+        app: web-login
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: web
+          image: ghcr.io/hungtrannhatt/hello-spring-k8s
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: 8080 }
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness,  port: 8080 }
+            initialDelaySeconds: 20
